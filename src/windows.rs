@@ -7,38 +7,20 @@
 // specific language governing permissions and limitations relating to use of the SAFE Network
 // Software.
 
-use winapi;
-use winreg;
-
-use self::winapi::windef::HWND;
-use self::winapi::winnt::LPCWSTR;
-use self::winreg::enums::HKEY_CURRENT_USER;
-use self::winreg::RegKey;
 use crate::app::App;
 
-use crate::errors::Error;
 use std::ffi::OsStr;
 use std::os::windows::ffi::OsStrExt;
 use std::path::Path;
-use std::ptr;
+use anyhow::Error;
+use winreg::enums::HKEY_CURRENT_USER;
+use winreg::RegKey;
 
 fn to_wide_chars(s: &str) -> Vec<u16> {
     OsStr::new(s)
         .encode_wide()
         .chain(Some(0).into_iter())
         .collect::<Vec<_>>()
-}
-
-#[link(name = "shell32")]
-extern "system" {
-    pub fn ShellExecuteW(
-        hwnd: HWND,
-        lpOperation: LPCWSTR,
-        lpFile: LPCWSTR,
-        lpParameters: LPCWSTR,
-        lpDirectory: LPCWSTR,
-        nShowCmd: i32,
-    ) -> i32;
 }
 
 // as described at https://msdn.microsoft.com/en-us/library/aa767914(v=vs.85).aspx
@@ -51,34 +33,14 @@ pub fn install(app: &App, schemes: &[String]) -> Result<(), Error> {
     let hkcu = RegKey::predef(HKEY_CURRENT_USER);
     for protocol in schemes {
         let base_path = Path::new("Software").join("Classes").join(protocol);
-        let key = hkcu.create_subkey(&base_path)?;
+        let (key, _) = hkcu.create_subkey(&base_path)?;
         // set our app name as the for reference
         key.set_value("", &app.name)?;
         key.set_value("URL Protocol", &"")?;
 
-        let command_key =
+        let (command_key, _) =
             hkcu.create_subkey(&base_path.join("shell").join("open").join("command"))?;
         command_key.set_value("", &format!("{} \"%1\"", app.exec))?
     }
     Ok(())
-}
-
-/// Open a given URI.
-#[allow(unsafe_code)]
-pub fn open<S: Into<String>>(uri: S) -> Result<(), Error> {
-    let err = unsafe {
-        ShellExecuteW(
-            ptr::null_mut(),
-            to_wide_chars("open").as_ptr(),
-            to_wide_chars(&(uri.into().replace("\n", "%0A"))).as_ptr(),
-            ptr::null(),
-            ptr::null(),
-            winapi::SW_SHOWNORMAL,
-        )
-    };
-    if err < 32 {
-        Err(Error::ShellOpenError(err))
-    } else {
-        Ok(())
-    }
 }

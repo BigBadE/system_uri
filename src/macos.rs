@@ -56,17 +56,6 @@ fn convert_to_cfstring(content: &str) -> CFStringRef {
     }
 }
 
-/// Open a given URI.
-pub fn open<S: Into<String>>(uri: S) -> Result<(), Error> {
-    let output = Command::new("open").arg(uri.into()).output()?;
-
-    if output.status.success() {
-        Ok(())
-    } else {
-        Err("Executing open failed. See terminal output for errors.".into())
-    }
-}
-
 /// Register the given App for the given schemes.
 ///
 /// `app` should contain all fields necessary for registering URIs on all systems. `schemes` should

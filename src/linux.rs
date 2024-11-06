@@ -16,21 +16,6 @@ use std::path::PathBuf;
 use std::process::Command;
 use xdg_basedir::dirs::get_data_home;
 
-/// Open a given URI.
-pub fn open<S: Into<String>>(uri: S) -> Result<(), Error> {
-    let uri = uri.into();
-
-    let output = Command::new("xdg-open").arg(uri.clone()).output()?;
-
-    if output.status.success() {
-        Ok(())
-    } else {
-        Err(Error::XdgOpenError(
-            uri,
-            String::from_utf8_lossy(&output.stdout).to_string(),
-        ))
-    }
-}
 
 /// Clean URI for xdg-open.
 fn clean_string(input: &str) -> String {

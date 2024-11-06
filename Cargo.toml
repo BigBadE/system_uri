@@ -1,38 +1,22 @@
 [package]
-authors = ["MaidSafe Developers <dev@maidsafe.net>"]
+authors = ["MaidSafe Developers <dev@maidsafe.net>", "BigBadE"]
 description = "System URI API library"
-documentation = "https://docs.rs/system_uri"
-homepage = "https://maidsafe.net"
 license = "MIT OR BSD-3-Clause"
 name = "system_uri"
 readme = "README.md"
-repository = "https://github.com/maidsafe/system_uri"
-version = "0.4.0"
-edition = "2018"
+repository = "https://github.com/BigBadE/system_uri"
+version = "0.5.0"
 
 [dependencies]
-quick-error = "~1.2.2"
-ffi_utils = { version = "~0.8.0", optional = true }
-libc  = { version = "~0.2.33", optional = true }
+anyhow = "1.0.93"
+base64 = "0.22.1"
 
-[dev-dependencies]
-rand = "~0.3.18"
-unwrap = "~1.2.0"
-
-[target.'cfg(target_os = "windows")'.dependencies]
-winreg = "~0.4.0"
-winapi = "~0.2.8"
+[target.'cfg(windows)'.dependencies]
+winreg = "0.52.0"
+windows-sys = {  version = "0.59.0", features = ["Win32_UI_Shell", "Win32"] }
 
 [target.'cfg(target_os = "linux")'.dependencies]
 xdg-basedir = "~1.0.0"
 
 [target.'cfg(target_os = "macos")'.dependencies]
 libc = "~0.2.33"
-
-[lib]
-crate_type = ["staticlib", "rlib", "cdylib"]
-name = "system_uri"
-
-[features]
-default = ["ffi"]
-ffi = ["libc", "ffi_utils"]
