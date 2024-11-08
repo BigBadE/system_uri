@@ -27,7 +27,7 @@ fn clean_string(input: &str) -> String {
 /// `app` should contain all fields necessary for registering URIs on all systems. `schemes` should
 /// provide a list of schemes (the initial part of a URI, like `https`).
 pub fn install(app: &App, schemes: &[String]) -> Result<(), Error> {
-    let home = get_data_home().map_err(|_| Error::Unexpected("Home directory not found"))?;
+    let home = get_data_home().map_err(|_| Error::msg("Home directory not found"))?;
     let ascii_name = format!(
         "{}-{}.desktop",
         clean_string(&app.vendor).as_str(),

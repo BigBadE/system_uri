@@ -13,6 +13,7 @@ use crate::app::App;
 
 use libc;
 use std::process::Command;
+use anyhow::Error;
 
 #[repr(C)]
 struct __CFString(libc::c_void);
