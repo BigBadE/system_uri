@@ -11,7 +11,6 @@
 
 use crate::app::App;
 
-use crate::errors::Error;
 use libc;
 use std::process::Command;
 

@@ -9,12 +9,12 @@
 
 use crate::app::App;
 
-use crate::errors::Error;
 use std::fs::{create_dir_all, File};
 use std::io::Write;
 use std::path::PathBuf;
 use std::process::Command;
 use xdg_basedir::dirs::get_data_home;
+use anyhow::Error;
 
 
 /// Clean URI for xdg-open.
@@ -62,12 +62,12 @@ pub fn install(app: &App, schemes: &[String]) -> Result<(), Error> {
         // app.icon.unwrap_or("".to_string()),
         mime_types = schemes_list.join(";")
     ))
-    .map_err(|_| Error::Unexpected("Could not write app desktop file"))?;
+    .map_err(|_| Error::msg("Could not write app desktop file"))?;
 
     let status = Command::new("update-desktop-database")
         .arg(apps_dir)
         .status()
-        .map_err(|_| Error::Unexpected("Could not run update-desktop-database"))?;
+        .map_err(|_| Error::msg("Could not run update-desktop-database"))?;
 
     for scheme in schemes_list {
         let _ = Command::new("xdg-mime")
@@ -80,6 +80,6 @@ pub fn install(app: &App, schemes: &[String]) -> Result<(), Error> {
     if status.success() {
         Ok(())
     } else {
-        Err(("Executing update-desktop-database failed. See terminal output for errors.").into())
+        Err(Error::msg("Executing update-desktop-database failed. See terminal output for errors."))
     }
 }

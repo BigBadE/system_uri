@@ -10,9 +10,6 @@
 //! # System-Uri Library
 //! [Project github page](https://github.com/maidsafe/system_uri)
 
-extern crate winreg;
-extern crate anyhow;
-
 mod app;
 pub use crate::app::App;
 
@@ -20,6 +17,9 @@ pub use crate::app::App;
 mod linux;
 #[cfg(target_os = "linux")]
 pub use crate::linux::install;
+#[cfg(target_os = "linux")]
+extern crate xdg_basedir;
+
 
 #[cfg(target_os = "windows")]
 mod windows;
